@@ -9,58 +9,79 @@ Reading II,     CH 6 Supporting Details,    Mar. 29 11:59PM
 Reading II,     TNO 36-40,                  April 2 2018
 """
 
-from datetime import date, datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 
 def printMenu():
     print(  "\n----MENU-----------\n"
             "t: show today tasks.\n"
+            "t: show tomorrow tasks.\n"
             "o: show overdue tasks.\n"
-            "u: show upcomming task\n"
+            "u: show upcomming task.\n"
             "s: search tasks by date (ex: mar. 26).\n"
             "----END OF MENU----\n")
 
+"""
+Mark the task is done base on ID (how to make ID?)
+"""
+def markTaskIsDone():
+    pass
+
+"""
+Show calendar and tasks for days of week
+"""
+def showCalendar():
+    pass
+
+"""
+Manage and auto decide what task to learn for each day every week
+input: 
+output:
+"""
+def autoDecidedTask():
+    pass
+
 def showTodayTask():
-    return searchByDate(date.today().isoformat())
+    return searchByDate(datetime.today().isoformat(), type='today')
+
+def showTomorrowTask():
+    return searchByDate(str(datetime.today() + timedelta(days=1)), type='tomorrow')
 
 def showOverDueTask():
-    return searchByDate(date.today().isoformat(), type="overdue")
+    return searchByDate(datetime.today().isoformat(), type="overdue")
 
 def showUpcommingTask():
-    return searchByDate(date.today().isoformat(), type="upcomming")
+    return searchByDate(datetime.today().isoformat(), type="upcomming")
 
 def searchTask():
     userDate = input("Please input your date: ")
     return searchByDate(userDate)           
 
+# order by date - increase - FIX ME
 def searchByDate(userDate, type='none'):
     hasTask = False
     #debug 
     #print(formatedData)
     try:
-        userDateFormated = parser.parse(userDate)
+        userDateFormated = parser.parse(userDate).strftime("%m-%d-%Y")
         print("\nPLANNER:")
-
-        if type == 'overdue':
-            print("OVERDUE\n")
-        elif type == 'upcomming':
-            print("UPCOMMING\n")
+        print(type.upper() + "\n")
         
         for i in range(len(formatedData))[::3]:
             plannerClass = formatedData[i]
             plannerTitle = formatedData[i+1]
             plannerDate = formatedData[i+2]
-            plannerDateFormated = parser.parse(plannerDate)
+            plannerDateFormated = parser.parse(plannerDate).strftime("%m-%d-%Y")
             # if the date match -> print out planner
             if type == 'overdue':
-                if  (plannerDateFormated.day < userDateFormated.day) and (plannerDateFormated.month <= userDateFormated.month) and (plannerDateFormated.year <= userDateFormated.year):
+                if  plannerDateFormated < userDateFormated:
                     print("%s ---> %s ---> %s" % (plannerClass, plannerTitle, plannerDate))
                     hasTask = True
-            elif type == 'upcomming':
-                if  (plannerDateFormated.day > userDateFormated.day) and (plannerDateFormated.month >= userDateFormated.month) and (plannerDateFormated.year >= userDateFormated.year):
+            elif type == 'upcomming': # FIX ME
+                if  plannerDateFormated > userDateFormated:
                     print("%s ---> %s ---> %s" % (plannerClass, plannerTitle, plannerDate))
                     hasTask = True
-            elif (plannerDateFormated.day == userDateFormated.day) and (plannerDateFormated.month == userDateFormated.month) and (plannerDateFormated.year == userDateFormated.year):
+            elif plannerDateFormated == userDateFormated:
                 print("%s ---> %s ---> %s" % (plannerClass, plannerTitle, plannerDate))
                 hasTask = True
         # empty task
@@ -69,6 +90,7 @@ def searchByDate(userDate, type='none'):
     except Exception as identifier:
         print(identifier)
         print("Error occur. Please input the correct value.")
+        return False
 
     return True
 
@@ -85,6 +107,8 @@ def loopPrompt():
             searchTask()            
         if userChosen == "t":
             showTodayTask()
+        if userChosen == "m":
+            showTomorrowTask()
         if userChosen == "o":
             showOverDueTask()
         if userChosen == "u":
